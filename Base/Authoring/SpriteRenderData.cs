@@ -1,7 +1,10 @@
 ﻿using System;
+using Fundering.Base.Data;
 using UnityEngine;
 
-namespace NSprites
+
+
+namespace Fundering.Base.Authoring
 {
     [Serializable]
     public struct SpriteRenderData

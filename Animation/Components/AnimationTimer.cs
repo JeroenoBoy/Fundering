@@ -1,6 +1,11 @@
 ﻿using Unity.Entities;
 
-public struct AnimationTimer : IComponentData
+
+
+namespace Fundering.Animation.Components
 {
-    public double value;
+    public struct AnimationTimer : IComponentData
+    {
+        public double value;
+    }
 }

@@ -1,10 +1,17 @@
-﻿using Unity.Burst;
+﻿using Fundering.Base.Common;
+using Fundering.Base.Components.Properties;
+using Fundering.Base.Components.Regular;
+using Fundering.FlatTransform.OldSystem.Components;
+using NSprites;
+using Unity.Burst;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEditor;
 
-namespace NSprites
+
+
+namespace Fundering.Base.Systems
 {
     [BurstCompile]
     public partial struct SpriteFrustumCullingSystem : ISystem
@@ -19,7 +26,7 @@ namespace NSprites
 
             private void Execute(Entity entity, [ChunkIndexInQuery]int chunkIndex, in WorldPosition2D worldPosition, in Scale2D size, in Pivot pivot)
             {
-                var viewCenterPosition = worldPosition.value - size.value * pivot.value + size.value * .5f;
+                float2 viewCenterPosition = worldPosition.value - size.value * pivot.value + size.value * .5f;
                 if(!CameraBounds2D.Intersects(new Bounds2D(viewCenterPosition, size.value)))
                     EntityCommandBuffer.AddComponent<CullSpriteTag>(chunkIndex, entity);
             }
@@ -34,7 +41,7 @@ namespace NSprites
 
             private void Execute(Entity entity, [ChunkIndexInQuery] int chunkIndex, in WorldPosition2D worldPosition, in Scale2D size, in Pivot pivot)
             {
-                var viewCenterPosition = worldPosition.value - size.value * pivot.value + size.value * .5f;
+                float2 viewCenterPosition = worldPosition.value - size.value * pivot.value + size.value * .5f;
                 if (CameraBounds2D.Intersects(new Bounds2D(viewCenterPosition, size.value)))
                     EntityCommandBuffer.RemoveComponent<CullSpriteTag>(chunkIndex, entity);
             }
@@ -49,12 +56,12 @@ namespace NSprites
         [MenuItem("NSprites/Toggle frustum culling system")]
         public static void ToggleFrustumCullingSystem()
         {
-            var systemHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<SpriteFrustumCullingSystem>();
+            SystemHandle systemHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<SpriteFrustumCullingSystem>();
 
             if (systemHandle == SystemHandle.Null)
                 return;
 
-            ref var systemState = ref World.DefaultGameObjectInjectionWorld.Unmanaged.ResolveSystemStateRef(systemHandle);
+            ref SystemState systemState = ref World.DefaultGameObjectInjectionWorld.Unmanaged.ResolveSystemStateRef(systemHandle);
 
             systemState.Enabled = !systemState.Enabled;
 
@@ -73,23 +80,23 @@ namespace NSprites
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
-            var cullingBounds2D = SystemAPI.GetComponent<CameraData>(state.SystemHandle).CullingBounds2D;
+            EndSimulationEntityCommandBufferSystem.Singleton ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            Bounds2D cullingBounds2D = SystemAPI.GetComponent<CameraData>(state.SystemHandle).CullingBounds2D;
 
-            var disableCulledJob = new DisableCulledJob
+            DisableCulledJob disableCulledJob = new DisableCulledJob
             {
                 EntityCommandBuffer = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter(),
                 CameraBounds2D = cullingBounds2D
             };
-            var disableCulledHandle = disableCulledJob.ScheduleParallelByRef(state.Dependency);
+            JobHandle disableCulledHandle = disableCulledJob.ScheduleParallelByRef(state.Dependency);
             
 
-            var enableUnculledJob = new EnableUnculledJob
+            EnableUnculledJob enableUnculledJob = new EnableUnculledJob
             {
                 EntityCommandBuffer = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter(),
                 CameraBounds2D = cullingBounds2D
             };
-            var enableUnculledHandle = enableUnculledJob.ScheduleParallelByRef(state.Dependency);
+            JobHandle enableUnculledHandle = enableUnculledJob.ScheduleParallelByRef(state.Dependency);
             
             state.Dependency = JobHandle.CombineDependencies(disableCulledHandle, enableUnculledHandle);
         }

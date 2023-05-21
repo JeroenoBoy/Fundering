@@ -1,12 +1,17 @@
 ﻿using System;
 using Unity.Entities;
 
-public struct SortingLayer : ISharedComponentData, IComparable<SortingLayer>
-{
-    public int index;
 
-    public int CompareTo(SortingLayer other)
+
+namespace Fundering.Sorting.Components
+{
+    public struct SortingLayer : ISharedComponentData, IComparable<SortingLayer>
     {
-        return index.CompareTo(other.index);
+        public int index;
+
+        public int CompareTo(SortingLayer other)
+        {
+            return index.CompareTo(other.index);
+        }
     }
 }

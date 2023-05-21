@@ -1,6 +1,8 @@
 ﻿using Unity.Mathematics;
 
-namespace NSprites
+
+
+namespace Fundering.Base.Common
 {
     public readonly struct Bounds2D
     {
@@ -41,10 +43,10 @@ namespace NSprites
 
         public bool Intersects(in Bounds2D bounds)
         {
-            var max = Max;
-            var min = Min;
-            var anotherMax = bounds.Max;
-            var anotherMin = bounds.Min;
+            float2 max = Max;
+            float2 min = Min;
+            float2 anotherMax = bounds.Max;
+            float2 anotherMin = bounds.Min;
 
             return min.x <= anotherMax.x && max.x >= anotherMin.x &&
                    min.y <= anotherMax.y && max.y >= anotherMin.y;

@@ -1,5 +1,8 @@
-﻿using NSprites;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Fundering.Base.Components.Properties;
+using Fundering.Base.Components.Regular;
+using Fundering.Sorting.Components;
+using Fundering.Sorting.Systems;
 using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
@@ -7,10 +10,11 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+using math = Fundering._2DTransform.math;
 
 [assembly: RegisterGenericJobType(typeof(SpriteSortingSystem.SortArrayJob<int, SpriteSortingSystem.SortingDataComparer>))]
 
-namespace NSprites
+namespace Fundering.Sorting.Systems
 {
     [BurstCompile]
     [WorldSystemFilter(WorldSystemFilterFlags.Default | WorldSystemFilterFlags.Editor)]
@@ -66,13 +70,13 @@ namespace NSprites
 
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
-                var entityArray = chunk.GetNativeArray(entityTypeHandle);
-                var worldPosition2DArray = chunk.GetNativeArray(ref worldPosition2D_CTH);
-                var sortingIndexes = chunk.GetNativeArray(ref sortingIndex_CTH);
-                var firstEntityIndex = chunkBasedEntityIndices[unfilteredChunkIndex];
+                NativeArray<Entity>       entityArray          = chunk.GetNativeArray(entityTypeHandle);
+                var                       worldPosition2DArray = chunk.GetNativeArray(ref worldPosition2D_CTH);
+                NativeArray<SortingIndex> sortingIndexes       = chunk.GetNativeArray(ref sortingIndex_CTH);
+                int                       firstEntityIndex     = chunkBasedEntityIndices[unfilteredChunkIndex];
                 for (int entityIndex = 0; entityIndex < entityArray.Length; entityIndex++)
                 {
-                    var arrayIndex = firstEntityIndex + entityIndex;
+                    int arrayIndex = firstEntityIndex + entityIndex;
                     sortingDataArray[arrayIndex] = new SortingData
                     {
                         position = worldPosition2DArray[entityIndex].value,
@@ -102,11 +106,11 @@ namespace NSprites
 
             public void Execute(int startIndex, int count)
             {
-                var toIndex = startIndex + count;
+                int toIndex = startIndex + count;
                 for (int i = startIndex; i < toIndex; i++)
                 {
-                    var from = PerLayerOffset * layerIndex;
-                    var to = from + PerLayerOffset;
+                    float from = PerLayerOffset * layerIndex;
+                    float to = from + PerLayerOffset;
                     sortingValues[pointers[i]] = new SortingValue { value = math.lerp(from, to, 1f - (float)i / pointers.Length) };
                 }
             }
@@ -120,7 +124,7 @@ namespace NSprites
 
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
-                var chunkSortingValues = chunk.GetNativeArray(ref sortingValue_CTH_WO);
+                NativeArray<SortingValue> chunkSortingValues = chunk.GetNativeArray(ref sortingValue_CTH_WO);
                 NativeArray<SortingValue>.Copy(sortingValues, chunkBasedEntityIndices[unfilteredChunkIndex], chunkSortingValues, 0, chunkSortingValues.Length);
             }
         }
@@ -143,20 +147,20 @@ namespace NSprites
 
         private JobHandle RegularSort(in EntityQuery sortingQuery, int sortingLayer, ref SystemState state)
         {
-            var spriteEntitiesCount = sortingQuery.CalculateEntityCount();
+            int spriteEntitiesCount = sortingQuery.CalculateEntityCount();
 
             if (spriteEntitiesCount == 0)
                 return default;
 
-            var sortingDataArray = new NativeArray<SortingData>(spriteEntitiesCount, Allocator.TempJob);
+            NativeArray<SortingData> sortingDataArray = new NativeArray<SortingData>(spriteEntitiesCount, Allocator.TempJob);
             // will use it to optimize sorting
-            var dataPointers = new NativeArray<int>(spriteEntitiesCount, Allocator.TempJob);
+            NativeArray<int> dataPointers = new NativeArray<int>(spriteEntitiesCount, Allocator.TempJob);
             // will use it to write back result values
-            var sortingValues = new NativeArray<SortingValue>(spriteEntitiesCount, Allocator.TempJob);
+            NativeArray<SortingValue> sortingValues = new NativeArray<SortingValue>(spriteEntitiesCount, Allocator.TempJob);
 
-            var chunkBaseEntityIndices = sortingQuery.CalculateBaseEntityIndexArrayAsync(Allocator.TempJob, default, out var calculateChunkBaseEntityIndices);
+            NativeArray<int> chunkBaseEntityIndices = sortingQuery.CalculateBaseEntityIndexArrayAsync(Allocator.TempJob, default, out JobHandle calculateChunkBaseEntityIndices);
 
-            var gatherSortingDataJob = new GatherSortingDataJob
+            GatherSortingDataJob gatherSortingDataJob = new GatherSortingDataJob
             {
                 entityTypeHandle = SystemAPI.GetEntityTypeHandle(),
                 worldPosition2D_CTH = SystemAPI.GetComponentTypeHandle<WorldPosition2D>(true),
@@ -165,10 +169,10 @@ namespace NSprites
                 sortingDataArray = sortingDataArray,
                 chunkBasedEntityIndices = chunkBaseEntityIndices
             };
-            var gatherSortingDataHandle = gatherSortingDataJob.ScheduleParallelByRef(sortingQuery, JobHandle.CombineDependencies(calculateChunkBaseEntityIndices, state.Dependency));
+            JobHandle gatherSortingDataHandle = gatherSortingDataJob.ScheduleParallelByRef(sortingQuery, JobHandle.CombineDependencies(calculateChunkBaseEntityIndices, state.Dependency));
 
             // after sorting dataPointers get sorted while sortingDataArray stay the same
-            var sortHandle = new SortArrayJob<int, SortingDataComparer>
+            JobHandle sortHandle = new SortArrayJob<int, SortingDataComparer>
             {
                 array = dataPointers,
                 comparer = new()
@@ -181,7 +185,7 @@ namespace NSprites
             _ = new DisposeArray<SortingData> { array = sortingDataArray }.Schedule(sortHandle);
             //_ = sortingDataArray.Dispose(sortHandle);
 
-            var genSortingValuesJob = new GenerateSortingValuesJob
+            JobHandle genSortingValuesJob = new GenerateSortingValuesJob
             {
                 layerIndex = sortingLayer,
                 sortingValues = sortingValues,
@@ -191,13 +195,13 @@ namespace NSprites
             //_ = dataPointers.Dispose(genSortingValuesJob);
             _ = new DisposeArray<int> { array = dataPointers }.Schedule(genSortingValuesJob);
 
-            var writeBackChunkDataJob = new WriteSortingValuesToChunksJob
+            WriteSortingValuesToChunksJob writeBackChunkDataJob = new WriteSortingValuesToChunksJob
             {
                 sortingValues = sortingValues,
                 sortingValue_CTH_WO = SystemAPI.GetComponentTypeHandle<SortingValue>(false),
                 chunkBasedEntityIndices = chunkBaseEntityIndices
             };
-            var writeBackChunkDataHandle = writeBackChunkDataJob.ScheduleParallelByRef(sortingQuery, genSortingValuesJob);
+            JobHandle writeBackChunkDataHandle = writeBackChunkDataJob.ScheduleParallelByRef(sortingQuery, genSortingValuesJob);
 
             //_ = chunkBaseEntityIndices.Dispose(writeBackChunkDataHandle);
             //_ = sortingValues.Dispose(writeBackChunkDataHandle);
@@ -210,15 +214,15 @@ namespace NSprites
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            var systemData = new SystemData();
-            var queryBuilder = new EntityQueryBuilder(Allocator.Temp)
-                .WithNone<CullSpriteTag>()
-                .WithAll<WorldPosition2D>()
-                .WithAll<SortingValue>()
-                .WithAll<SortingIndex>()
-                .WithAll<SortingLayer>()
-                .WithAll<VisualSortingTag>()
-                .WithNone<SortingStaticTag>();
+            SystemData systemData = new SystemData();
+            EntityQueryBuilder queryBuilder = new EntityQueryBuilder(Allocator.Temp)
+                                             .WithNone<CullSpriteTag>()
+                                             .WithAll<WorldPosition2D>()
+                                             .WithAll<SortingValue>()
+                                             .WithAll<SortingIndex>()
+                                             .WithAll<SortingLayer>()
+                                             .WithAll<VisualSortingTag>()
+                                             .WithNone<SortingStaticTag>();
             systemData.sortingSpritesQuery = state.GetEntityQuery(queryBuilder);
 
             queryBuilder.Reset();
@@ -243,25 +247,25 @@ namespace NSprites
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var systemData = SystemAPI.GetComponent<SystemData>(state.SystemHandle);
-            var sortingSpritesIsEmpty = systemData.sortingSpritesQuery.IsEmpty;
+            SystemData systemData = SystemAPI.GetComponent<SystemData>(state.SystemHandle);
+            bool sortingSpritesIsEmpty = systemData.sortingSpritesQuery.IsEmpty;
             systemData.sortingSpritesQuery.AddOrderVersionFilter();
-            var sortingStaticSpritesIsEmpty = systemData.sortingSpritesQuery.IsEmpty;
+            bool sortingStaticSpritesIsEmpty = systemData.sortingSpritesQuery.IsEmpty;
             systemData.sortingSpritesQuery.ResetFilter();
 
             if (sortingSpritesIsEmpty && sortingStaticSpritesIsEmpty)
                 return;
 
-            state.EntityManager.GetAllUniqueSharedComponents<SortingLayer>(out var sortingLayers, Allocator.Temp);
-            var bothModes = !sortingSpritesIsEmpty & !sortingSpritesIsEmpty;
-            var handles = new NativeArray<JobHandle>(sortingLayers.Length * (bothModes ? 2 : 1), Allocator.Temp);
-            var staticHandlesOffset = bothModes ? sortingLayers.Length : 0;
+            state.EntityManager.GetAllUniqueSharedComponents<SortingLayer>(out NativeList<SortingLayer> sortingLayers, Allocator.Temp);
+            bool                   bothModes           = !sortingSpritesIsEmpty & !sortingSpritesIsEmpty;
+            NativeArray<JobHandle> handles             = new NativeArray<JobHandle>(sortingLayers.Length * (bothModes ? 2 : 1), Allocator.Temp);
+            int                    staticHandlesOffset = bothModes ? sortingLayers.Length : 0;
 
             if (!sortingSpritesIsEmpty)
             {
                 for (int i = 0; i < sortingLayers.Length; i++)
                 {
-                    var sortingLayer = sortingLayers[i];
+                    SortingLayer sortingLayer = sortingLayers[i];
                     systemData.sortingSpritesQuery.SetSharedComponentFilter(sortingLayer);
                     handles[i] = RegularSort(systemData.sortingSpritesQuery, sortingLayer.index, ref state);
                 }
@@ -271,7 +275,7 @@ namespace NSprites
             {
                 for (int i = 0; i < sortingLayers.Length; i++)
                 {
-                    var sortingLayer = sortingLayers[i];
+                    SortingLayer sortingLayer = sortingLayers[i];
                     systemData.sortingStaticSpritesQuery.SetSharedComponentFilter(sortingLayer);
                     handles[staticHandlesOffset + i] = RegularSort(systemData.sortingStaticSpritesQuery, sortingLayer.index, ref state);
                 }

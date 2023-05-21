@@ -1,7 +1,9 @@
 ﻿using Unity.Entities;
 using Unity.Mathematics;
 
-namespace NSprites
+
+
+namespace Fundering.Base.Components.Properties
 {
     /// <summary>
     /// Supposed to use as texture ST to locate actual texture on atlas if used (if not use default value). In shader every float2 UV would be multiplied to value.xy and offsetted with value.zw

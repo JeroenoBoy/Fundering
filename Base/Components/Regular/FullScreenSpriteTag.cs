@@ -1,6 +1,8 @@
 ﻿using Unity.Entities;
 
-namespace NSprites
+
+
+namespace Fundering.Base.Components.Regular
 {
     public struct FullScreenSpriteTag : IComponentData
     {

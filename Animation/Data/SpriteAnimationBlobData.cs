@@ -1,7 +1,9 @@
 ﻿using Unity.Entities;
 using Unity.Mathematics;
 
-namespace NSprites
+
+
+namespace Fundering.Animation.Data
 {
     public struct SpriteAnimationBlobData
     {

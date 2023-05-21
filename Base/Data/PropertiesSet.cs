@@ -1,7 +1,10 @@
 using System;
+using NSprites;
 using UnityEngine;
 
-namespace NSprites
+
+
+namespace Fundering.Base.Data
 {
     [CreateAssetMenu(fileName = "PropertiesSet", menuName = "NSprites/Shader Properties Set", order = 1)]
     public class PropertiesSet : ScriptableObject
@@ -19,7 +22,7 @@ namespace NSprites
             {
                 if (rawDataSet == null)
                     return default;
-                var result = new PropertyData[rawDataSet.Length];
+                PropertyData[] result = new PropertyData[rawDataSet.Length];
                 for (int i = 0; i < rawDataSet.Length; i++)
                     result[i] = rawDataSet[i];
                 return result;

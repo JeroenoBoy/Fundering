@@ -1,8 +1,12 @@
 ﻿using System.Collections.Generic;
+using Fundering.Base.Authoring;
+using NSprites;
 using Unity.Collections;
 using Unity.Entities;
 
-namespace NSprites
+
+
+namespace Fundering.Base.Systems
 {
     [WorldSystemFilter(WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.Default)]
     public partial class RegisterRenderersSystem : SystemBase
@@ -48,13 +52,13 @@ namespace NSprites
 
             void Register(in NativeArray<Entity> entities)
             {
-                if (!SystemAPI.ManagedAPI.TryGetSingleton<RenderArchetypeStorage>(out var renderArchetypeStorage))
+                if (!SystemAPI.ManagedAPI.TryGetSingleton<RenderArchetypeStorage>(out RenderArchetypeStorage renderArchetypeStorage))
                     return;
 
-                for(var i = 0; i < entities.Length; i++)
+                for(int i = 0; i < entities.Length; i++)
                 {
-                    var entity = entities[i];
-                    var renderData = EntityManager.GetComponentObject<SpriteRenderDataToRegister>(entity);
+                    Entity entity = entities[i];
+                    SpriteRenderDataToRegister renderData = EntityManager.GetComponentObject<SpriteRenderDataToRegister>(entity);
 
                     if (!_registeredIDsSet.Contains(renderData.data.ID))
                     {

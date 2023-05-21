@@ -1,11 +1,19 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Fundering.Animation.Components;
+using Fundering.Animation.Data;
+using Fundering.Base.Authoring;
+using Fundering.Base.Components.Properties;
+using NSprites;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace NSprites
+
+
+namespace Fundering.Animation.Authoring
 {
     /// <summary>
     /// Advanced <see cref="SpriteRendererAuthoring"/> which also bakes animation data as blob asset and adds animation components.
@@ -19,12 +27,12 @@ namespace NSprites
                 if(!authoring.IsValid)
                     return;
 
-                var entity = GetEntity(TransformUsageFlags.None);
+                Entity entity = GetEntity(TransformUsageFlags.None);
 
                 BakeSpriteAnimation(this, entity, authoring.AnimationSet, authoring.InitialAnimationIndex);
 
-                var initialAnimData = authoring.AnimationSet.Animations.ElementAt(authoring.InitialAnimationIndex).data;
-                var initialAnimUVAtlas = (float4)NSpritesUtils.GetTextureST(initialAnimData.SpriteSheet);
+                SpriteAnimation initialAnimData = authoring.AnimationSet.Animations.ElementAt(authoring.InitialAnimationIndex).data;
+                float4 initialAnimUVAtlas = (float4)NSpritesUtils.GetTextureST(initialAnimData.SpriteSheet);
 
                 BakeSpriteRender
                 (
@@ -58,7 +66,7 @@ namespace NSprites
         {
             get
             {
-                var animationData = AnimationSet.Animations.ElementAt(InitialAnimationIndex).data;
+                SpriteAnimation animationData = AnimationSet.Animations.ElementAt(InitialAnimationIndex).data;
                 return GetSpriteSize(animationData.SpriteSheet) / animationData.FrameCount;
             }
         }
@@ -115,16 +123,16 @@ namespace NSprites
             }
             
             #region create animation blob asset
-            var blobBuilder = new BlobBuilder(Allocator.Temp); //can't use `using` keyword because there is extension which use this + ref
-            ref var root = ref blobBuilder.ConstructRoot<BlobArray<SpriteAnimationBlobData>>();
-            var animations = animationSet.Animations;
-            var animationArray = blobBuilder.Allocate(ref root, animations.Count);
+            BlobBuilder                                            blobBuilder    = new BlobBuilder(Allocator.Temp); //can't use `using` keyword because there is extension which use this + ref
+            ref BlobArray<SpriteAnimationBlobData>                 root           = ref blobBuilder.ConstructRoot<BlobArray<SpriteAnimationBlobData>>();
+            IReadOnlyCollection<SpriteAnimationSet.NamedAnimation> animations     = animationSet.Animations;
+            BlobBuilderArray<SpriteAnimationBlobData>              animationArray = blobBuilder.Allocate(ref root, animations.Count);
 
-            var animIndex = 0;
-            foreach (var anim in animations)
+            int animIndex = 0;
+            foreach (SpriteAnimationSet.NamedAnimation anim in animations)
             {
-                var animData = anim.data;
-                var animationDuration = 0f;
+                SpriteAnimation animData = anim.data;
+                float animationDuration = 0f;
                 for (int i = 0; i < animData.FrameDurations.Length; i++)
                     animationDuration += animData.FrameDurations[i];
 
@@ -138,19 +146,19 @@ namespace NSprites
                     // FrameDuration - allocate lately
                 };
 
-                var durations = blobBuilder.Allocate(ref animationArray[animIndex].FrameDurations, animData.FrameDurations.Length);
+                BlobBuilderArray<float> durations = blobBuilder.Allocate(ref animationArray[animIndex].FrameDurations, animData.FrameDurations.Length);
                 for (int di = 0; di < durations.Length; di++)
                     durations[di] = animData.FrameDurations[di];
 
                 animIndex++;
             }
 
-            var blobAssetReference = blobBuilder.CreateBlobAssetReference<BlobArray<SpriteAnimationBlobData>>(Allocator.Persistent);
+            BlobAssetReference<BlobArray<SpriteAnimationBlobData>> blobAssetReference = blobBuilder.CreateBlobAssetReference<BlobArray<SpriteAnimationBlobData>>(Allocator.Persistent);
             baker.AddBlobAsset(ref blobAssetReference, out _);
             blobBuilder.Dispose();
             #endregion
 
-            ref var initialAnim = ref blobAssetReference.Value[initialAnimationIndex];
+            ref SpriteAnimationBlobData initialAnim = ref blobAssetReference.Value[initialAnimationIndex];
 
             baker.AddComponent(entity, new AnimationSetLink { value = blobAssetReference });
             baker.AddComponent(entity, new AnimationIndex { value = initialAnimationIndex });

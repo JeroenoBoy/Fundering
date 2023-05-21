@@ -1,7 +1,9 @@
 ﻿using Unity.Entities;
 using Unity.Mathematics;
 
-namespace NSprites
+
+
+namespace Fundering.Base.Components.Properties
 {
     /// <summary>
     /// Supposed to use as texture ST to perform tiling and offset which will be repeted inside texture located with <see cref="UVAtlas"/>.

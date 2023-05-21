@@ -1,3 +1,6 @@
+using Fundering.Base.Components.Properties;
+using Fundering.Base.Components.Regular;
+using Fundering.FlatTransform.OldSystem.Components;
 using NSprites;
 
 [assembly: InstancedPropertyComponent(typeof(UVTilingAndOffset), "_uvTilingAndOffsetBuffer")]

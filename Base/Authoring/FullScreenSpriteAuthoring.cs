@@ -1,7 +1,10 @@
-﻿using Unity.Entities;
+﻿using Fundering.Base.Components.Regular;
+using Unity.Entities;
 using UnityEngine;
 
-namespace NSprites
+
+
+namespace Fundering.Base.Authoring
 {
     public class FullScreenSpriteAuthoring : MonoBehaviour
     {
@@ -14,7 +17,7 @@ namespace NSprites
                 if(authoring._spriteAuthoring == null)
                     return;
                 
-                var entity = GetEntity(TransformUsageFlags.None);
+                Entity entity = GetEntity(TransformUsageFlags.None);
                 AddComponent<FullScreenSpriteTag>(entity);
                 AddComponent(entity, new NativeSpriteSize{ Value = authoring._spriteAuthoring.NativeSpriteSize });
 

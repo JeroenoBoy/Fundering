@@ -1,6 +1,11 @@
 ﻿using Unity.Entities;
 
-public struct SortingIndex : IComponentData
+
+
+namespace Fundering.Sorting.Components
 {
-    public int value;
+    public struct SortingIndex : IComponentData
+    {
+        public int value;
+    }
 }

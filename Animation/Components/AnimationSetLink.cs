@@ -1,7 +1,12 @@
-﻿using NSprites;
+﻿using Fundering.Animation.Data;
 using Unity.Entities;
 
-public struct AnimationSetLink : IComponentData
+
+
+namespace Fundering.Animation.Components
 {
-    public BlobAssetReference<BlobArray<SpriteAnimationBlobData>> value;
+    public struct AnimationSetLink : IComponentData
+    {
+        public BlobAssetReference<BlobArray<SpriteAnimationBlobData>> value;
+    }
 }

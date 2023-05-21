@@ -1,8 +1,11 @@
-﻿using Unity.Entities;
+﻿using Fundering.Base.Common;
+using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
-namespace NSprites
+
+
+namespace Fundering.Base.Systems
 {
     [UpdateBefore(typeof(SpriteFrustumCullingSystem))]
     public partial struct UpdateCullingDataSystem : ISystem
@@ -29,11 +32,11 @@ namespace NSprites
 
         public void OnUpdate(ref SystemState state)
         {
-            var camera = state.EntityManager.GetComponentObject<SystemData>(state.SystemHandle).Camera;
-            var cameraPos = camera.transform.position;
-            var leftBottomPoint = camera.ScreenToWorldPoint(new Vector3(0f, 0f, 0f));
-            var rightUpPoint = camera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0f));
-            var cameraViewBounds2D = new Bounds2D(new float2x2(new float2(leftBottomPoint.x, leftBottomPoint.y), new float2(rightUpPoint.x, rightUpPoint.y)));
+            Camera camera = state.EntityManager.GetComponentObject<SystemData>(state.SystemHandle).Camera;
+            Vector3 cameraPos = camera.transform.position;
+            Vector3 leftBottomPoint = camera.ScreenToWorldPoint(new Vector3(0f, 0f, 0f));
+            Vector3 rightUpPoint = camera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0f));
+            Bounds2D cameraViewBounds2D = new Bounds2D(new float2x2(new float2(leftBottomPoint.x, leftBottomPoint.y), new float2(rightUpPoint.x, rightUpPoint.y)));
             SystemAPI.SetSingleton(new SpriteFrustumCullingSystem.CameraData
             {
                 Position = new float2(cameraPos.x, cameraPos.y),

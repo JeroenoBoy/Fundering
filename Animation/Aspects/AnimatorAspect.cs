@@ -1,6 +1,11 @@
-﻿using Unity.Entities;
+﻿using Fundering.Animation.Components;
+using Fundering.Animation.Data;
+using NSprites;
+using Unity.Entities;
 
-namespace NSprites
+
+
+namespace Fundering.Animation.Aspects
 {
     public readonly partial struct AnimatorAspect : IAspect
     {
@@ -15,8 +20,8 @@ namespace NSprites
         public void SetAnimation(int toAnimationIndex, in double worldTime)
         {
             // find animation by animation ID
-            ref var animSet = ref _animationSetLink.ValueRO.value.Value;
-            var setToAnimIndex = -1;
+            ref BlobArray<SpriteAnimationBlobData> animSet        = ref _animationSetLink.ValueRO.value.Value;
+            int             setToAnimIndex = -1;
             for (int i = 0; i < animSet.Length; i++)
                 if (animSet[i].ID == toAnimationIndex)
                 {
@@ -29,7 +34,7 @@ namespace NSprites
 
             if (_animationIndex.ValueRO.value != setToAnimIndex)
             {
-                ref var animData = ref animSet[setToAnimIndex];
+                ref SpriteAnimationBlobData animData = ref animSet[setToAnimIndex];
                 _animationIndex.ValueRW.value = setToAnimIndex;
                 // here we want to set last frame and timer to 0 (equal to current time) to force animation system instantly switch
                 // animation to 1st frame after we've modified it
@@ -40,7 +45,7 @@ namespace NSprites
 
         public void SetToFrame(int frameIndex, in double worldTime)
         {
-            ref var animData = ref _animationSetLink.ValueRO.value.Value[_animationIndex.ValueRO.value];
+            ref SpriteAnimationBlobData animData = ref _animationSetLink.ValueRO.value.Value[_animationIndex.ValueRO.value];
             _frameIndex.ValueRW.value = frameIndex;
             _animationTimer.ValueRW.value = worldTime + animData.FrameDurations[frameIndex];
         }

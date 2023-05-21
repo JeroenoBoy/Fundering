@@ -1,6 +1,11 @@
 ﻿using Unity.Entities;
 
-public struct FrameIndex : IComponentData
+
+
+namespace Fundering.Animation.Components
 {
-    public int value;
+    public struct FrameIndex : IComponentData
+    {
+        public int value;
+    }
 }

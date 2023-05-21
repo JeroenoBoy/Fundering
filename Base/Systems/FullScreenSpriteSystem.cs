@@ -1,8 +1,13 @@
-﻿using Unity.Burst;
+﻿using Fundering.Base.Common;
+using Fundering.Base.Components.Properties;
+using Fundering.Base.Components.Regular;
+using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 
-namespace NSprites
+
+
+namespace Fundering.Base.Systems
 {
     [UpdateAfter(typeof(UpdateCullingDataSystem))]
     public partial struct FullScreenSpriteSystem : ISystem
@@ -37,16 +42,16 @@ namespace NSprites
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            if(!SystemAPI.TryGetSingleton<SpriteFrustumCullingSystem.CameraData>(out var cameraData))
+            if(!SystemAPI.TryGetSingleton<SpriteFrustumCullingSystem.CameraData>(out SpriteFrustumCullingSystem.CameraData cameraData))
                 return;
             
-            var sysData = SystemAPI.GetComponentRW<SystemData>(state.SystemHandle);
+            RefRW<SystemData> sysData = SystemAPI.GetComponentRW<SystemData>(state.SystemHandle);
 
             if(cameraData.CullingBounds2D != sysData.ValueRO.LastCameraBounds)
             {
                 sysData.ValueRW.LastCameraBounds = cameraData.CullingBounds2D;
                 
-                var recalculateSpriteJob = new RecalculateSpritesJob
+                RecalculateSpritesJob recalculateSpriteJob = new RecalculateSpritesJob
                 {
                     CameraPosition = cameraData.Position,
                     ScreenSize = cameraData.CullingBounds2D.Size

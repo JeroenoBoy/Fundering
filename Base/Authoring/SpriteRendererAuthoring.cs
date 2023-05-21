@@ -1,9 +1,15 @@
 ﻿using System.Collections.Generic;
+using Fundering.Base.Components.Properties;
+using Fundering.Sorting.Components;
+using NSprites;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
+using SortingLayer = Fundering.Sorting.Components.SortingLayer;
 
-namespace NSprites
+
+
+namespace Fundering.Base.Authoring
 {
     /// <summary>
     /// Adds basic render components such as <see cref="UVAtlas"/>, <see cref="UVTilingAndOffset"/>, <see cref="Scale2D"/>, <see cref="Pivot"/>.
@@ -21,7 +27,7 @@ namespace NSprites
                 DependsOn(authoring);
                 DependsOn(authoring._sprite);
 
-                var entity = GetEntity(TransformUsageFlags.None);
+                Entity entity = GetEntity(TransformUsageFlags.None);
 
                 BakeSpriteRender
                 (
@@ -48,7 +54,7 @@ namespace NSprites
         }
 
         [SerializeField] protected Sprite _sprite;
-        private Sprite _lastAssignedSprite;
+        private Sprite lastAssignedSprite;
         [SerializeField] protected SpriteRenderData _spriteRenderData;
         [SerializeField] protected bool _overrideSpriteTexture = true;
         [SerializeField] protected float2 _pivot = new(.5f);
@@ -69,9 +75,9 @@ namespace NSprites
 
         private void OnValidate()
         {
-            if (_sprite != _lastAssignedSprite && _sprite != null)
+            if (_sprite != lastAssignedSprite && _sprite != null)
             {
-                _lastAssignedSprite = _sprite;
+                lastAssignedSprite = _sprite;
 
                 if(!_lockSize)
                     _size = NativeSpriteSize;
@@ -126,7 +132,7 @@ namespace NSprites
 
         protected Material GetOrCreateOverridedMaterial(Texture texture)
         {
-            if (!_overridedMaterials.TryGetValue(texture, out var material))
+            if (!_overridedMaterials.TryGetValue(texture, out Material material))
                 material = CreateOverridedMaterial(texture);
 #if UNITY_EDITOR //for SubScene + domain reload
             else if (material == null)
@@ -139,7 +145,7 @@ namespace NSprites
         }
         protected Material CreateOverridedMaterial(Texture texture)
         {
-            var material = new Material(_spriteRenderData.Material);
+            Material material = new Material(_spriteRenderData.Material);
             material.SetTexture("_MainTex", _sprite.texture);
             _overridedMaterials.Add(texture, material);
             return material;

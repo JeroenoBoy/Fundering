@@ -1,7 +1,12 @@
 ﻿using Unity.Entities;
 using Unity.Mathematics;
 
-public struct MainTexSTInitial : IComponentData
+
+
+namespace Fundering.Base.Components.Properties
 {
-    public float4 value;
+    public struct MainTexSTInitial : IComponentData
+    {
+        public float4 value;
+    }
 }

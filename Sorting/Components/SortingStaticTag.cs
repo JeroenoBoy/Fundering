@@ -1,5 +1,10 @@
 ﻿using Unity.Entities;
 
-public struct SortingStaticTag : IComponentData
+
+
+namespace Fundering.Sorting.Components
 {
+    public struct SortingStaticTag : IComponentData
+    {
+    }
 }

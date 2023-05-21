@@ -1,7 +1,10 @@
+using NSprites;
 using Unity.Entities;
 using UnityEngine;
 
-namespace NSprites
+
+
+namespace Fundering.Base.Authoring
 {
     /// <summary>
     /// Gets <see cref="SpriteRenderData"/> through virtual <see cref="RenderData"/> property then adds <see cref="SpriteRenderDataToRegister"/>.
@@ -17,9 +20,9 @@ namespace NSprites
                 if (!authoring.IsValid)
                     return;
 
-                var renderData = authoring.RenderData;
+                SpriteRenderData renderData = authoring.RenderData;
                 DependsOn(renderData.PropertiesSet);
-                var entity = GetEntity(TransformUsageFlags.None);
+                Entity entity = GetEntity(TransformUsageFlags.None);
                 AddComponentObject(entity, new SpriteRenderDataToRegister { data = renderData });
                 this.AddSpriteRenderComponents(entity, renderData.ID);
             }

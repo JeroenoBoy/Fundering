@@ -85,7 +85,7 @@ namespace Fundering.Authoring
             }
         }
 
-        public static void BakeSpriteRender<TAuthoring>(Baker<TAuthoring> baker, in Entity entity, TAuthoring authoring, in float4 uvAtlas, in float4 uvTilingAndOffset, in float2 pivot, in float2 scale, bool flipX = false, bool flipY = false, bool add2DTransform = true)
+        public static void BakeSpriteRender<TAuthoring>(Baker<TAuthoring> baker, in Entity entity, TAuthoring authoring, in float4 uvAtlas, in float4 uvTilingAndOffset, in float2 pivot, in float2 scale, bool flipX = false, bool flipY = false)
             where TAuthoring : MonoBehaviour
         {
             if (baker == null)
@@ -104,12 +104,6 @@ namespace Fundering.Authoring
             baker.AddComponent(entity, new Pivot { Value = pivot });
             baker.AddComponent(entity, new Scale2D { Value = scale });
             baker.AddComponent(entity, new Flip { Value = new(flipX ? -1 : 0, flipY ? -1 : 0) });
-
-            if (add2DTransform)
-            {
-                baker.AddComponentObject(entity, new Transform2DRequest { Source = authoring.gameObject });
-                baker.DependsOn(authoring.transform);
-            }
         }
 
         public static void BakeSpriteSorting<TAuthoring>(Baker<TAuthoring> baker, in Entity entity, int sortingIndex, int sortingLayer, bool staticSorting = false)
@@ -130,6 +124,8 @@ namespace Fundering.Authoring
         }
 
         private static readonly Dictionary<Texture, Material> overridedMaterials = new();
+        private static readonly int                           mainTex            = Shader.PropertyToID("_MainTex");
+
 
         protected Material GetOrCreateOverridedMaterial(Texture texture)
         {
@@ -147,7 +143,7 @@ namespace Fundering.Authoring
         protected Material CreateOverridedMaterial(Texture texture)
         {
             Material material = new Material(_spriteRenderData.Material);
-            material.SetTexture("_MainTex", _sprite.texture);
+            material.SetTexture(mainTex, _sprite.texture);
             overridedMaterials.Add(texture, material);
             return material;
         }

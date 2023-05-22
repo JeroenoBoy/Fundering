@@ -10,7 +10,7 @@ namespace Fundering.Authoring
     {
         [SerializeField] private SpriteRendererAuthoring _spriteAuthoring;
         
-        private partial class Baker : Baker<FullScreenSpriteAuthoring>
+        private class Baker : Baker<FullScreenSpriteAuthoring>
         {
             public override void Bake(FullScreenSpriteAuthoring authoring)
             {

@@ -1,3 +1,4 @@
+using Fundering.Transform2D.Authoring;
 using NSprites;
 using Unity.Entities;
 using UnityEngine;
@@ -10,6 +11,7 @@ namespace Fundering.Authoring
     /// Gets <see cref="SpriteRenderData"/> through virtual <see cref="RenderData"/> property then adds <see cref="SpriteRenderDataToRegister"/>.
     /// Lately baking system will catch those entities and add needed components for rendering. 
     /// </summary>
+    [RequireComponent(typeof(Transform2DAuthoring))]
     public abstract class SpriteRendererAuthoringBase : MonoBehaviour
     {
         [BakeDerivedTypes]

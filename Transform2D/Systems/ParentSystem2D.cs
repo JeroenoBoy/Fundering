@@ -10,7 +10,7 @@ using Unity.Profiling;
 
 
 
-namespace Fundering.FlatTransform.Systems
+namespace Fundering.Transform2D.Systems
 {
     /// <summary>
     /// This system maintains parent/child relationships between entities within a transform hierarchy.

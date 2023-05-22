@@ -10,17 +10,17 @@ namespace Fundering.Animation.Aspects
     public readonly partial struct AnimatorAspect : IAspect
     {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-        private readonly Entity _entity;
+        private readonly Entity entity;
 #endif
-        private readonly RefRW<AnimationIndex> _animationIndex;
-        private readonly RefRW<AnimationTimer> _animationTimer;
-        private readonly RefRW<FrameIndex> _frameIndex;
-        private readonly RefRO<AnimationSetLink> _animationSetLink;
+        private readonly RefRW<AnimationIndex> animationIndex;
+        private readonly RefRW<AnimationTimer> animationTimer;
+        private readonly RefRW<FrameIndex> frameIndex;
+        private readonly RefRO<AnimationSetLink> animationSetLink;
 
         public void SetAnimation(int toAnimationIndex, in double worldTime)
         {
             // find animation by animation ID
-            ref BlobArray<SpriteAnimationBlobData> animSet        = ref _animationSetLink.ValueRO.value.Value;
+            ref BlobArray<SpriteAnimationBlobData> animSet        = ref animationSetLink.ValueRO.Value.Value;
             int             setToAnimIndex = -1;
             for (int i = 0; i < animSet.Length; i++)
                 if (animSet[i].ID == toAnimationIndex)
@@ -30,24 +30,24 @@ namespace Fundering.Animation.Aspects
                 }
 
             if (setToAnimIndex == -1)
-                throw new NSpritesException($"{nameof(AnimatorAspect)}.{nameof(SetAnimation)}: incorrect {nameof(toAnimationIndex)} was passed. {_entity} has no animation with such ID ({toAnimationIndex}) was found");
+                throw new NSpritesException($"{nameof(AnimatorAspect)}.{nameof(SetAnimation)}: incorrect {nameof(toAnimationIndex)} was passed. {entity} has no animation with such ID ({toAnimationIndex}) was found");
 
-            if (_animationIndex.ValueRO.value != setToAnimIndex)
+            if (animationIndex.ValueRO.Value != setToAnimIndex)
             {
                 ref SpriteAnimationBlobData animData = ref animSet[setToAnimIndex];
-                _animationIndex.ValueRW.value = setToAnimIndex;
+                animationIndex.ValueRW.Value = setToAnimIndex;
                 // here we want to set last frame and timer to 0 (equal to current time) to force animation system instantly switch
                 // animation to 1st frame after we've modified it
-                _frameIndex.ValueRW.value = animData.FrameDurations.Length - 1;
-                _animationTimer.ValueRW.value = worldTime;
+                frameIndex.ValueRW.Value = animData.FrameDurations.Length - 1;
+                animationTimer.ValueRW.Value = worldTime;
             }
         }
 
         public void SetToFrame(int frameIndex, in double worldTime)
         {
-            ref SpriteAnimationBlobData animData = ref _animationSetLink.ValueRO.value.Value[_animationIndex.ValueRO.value];
-            _frameIndex.ValueRW.value = frameIndex;
-            _animationTimer.ValueRW.value = worldTime + animData.FrameDurations[frameIndex];
+            ref SpriteAnimationBlobData animData = ref animationSetLink.ValueRO.Value.Value[animationIndex.ValueRO.Value];
+            this.frameIndex.ValueRW.Value = frameIndex;
+            animationTimer.ValueRW.Value = worldTime + animData.FrameDurations[frameIndex];
         }
 
         public void ResetAnimation(in double worldTime) =>

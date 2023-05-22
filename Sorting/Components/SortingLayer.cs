@@ -7,11 +7,11 @@ namespace Fundering.Sorting.Components
 {
     public struct SortingLayer : ISharedComponentData, IComparable<SortingLayer>
     {
-        public int index;
+        public int Index;
 
         public int CompareTo(SortingLayer other)
         {
-            return index.CompareTo(other.index);
+            return Index.CompareTo(other.Index);
         }
     }
 }

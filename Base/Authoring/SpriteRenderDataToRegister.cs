@@ -2,10 +2,10 @@
 
 
 
-namespace Fundering.Base.Authoring
+namespace Fundering.Authoring
 {
     public class SpriteRenderDataToRegister : IComponentData
     {
-        public SpriteRenderData data;
+        public SpriteRenderData Data;
     }
 }

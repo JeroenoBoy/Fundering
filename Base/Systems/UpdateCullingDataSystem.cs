@@ -1,26 +1,26 @@
-﻿using Fundering.Base.Common;
+﻿using Fundering.Common;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
 
 
-namespace Fundering.Base.Systems
+namespace Fundering.Systems
 {
     [UpdateBefore(typeof(SpriteFrustumCullingSystem))]
     public partial struct UpdateCullingDataSystem : ISystem
     {
         private class SystemData : IComponentData
         {
-            private Camera _camera;
+            private Camera camera;
 
             public Camera Camera
             {
                 get
                 {
-                    if(_camera == null)
-                        _camera = Camera.main;
-                    return _camera;
+                    if(camera == null)
+                        camera = Camera.main;
+                    return camera;
                 }
             }
         }

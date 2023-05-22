@@ -3,7 +3,7 @@ using Unity.Mathematics;
 
 
 
-namespace Fundering.Base.Components.Properties
+namespace Fundering.Components.Properties
 {
     /// <summary>
     /// Supposed to use as texture ST to perform tiling and offset which will be repeted inside texture located with <see cref="UVAtlas"/>.
@@ -11,8 +11,8 @@ namespace Fundering.Base.Components.Properties
     /// </summary>
     public struct UVTilingAndOffset : IComponentData
     {
-        public float4 value;
+        public float4 Value;
 
-        public static UVTilingAndOffset Default => new() { value = new float4(1f, 1f, 0f, 0f) };
+        public static UVTilingAndOffset Default => new() { Value = new float4(1f, 1f, 0f, 0f) };
     }
 }

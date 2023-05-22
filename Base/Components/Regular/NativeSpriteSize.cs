@@ -3,7 +3,7 @@ using Unity.Mathematics;
 
 
 
-namespace Fundering.Base.Components.Regular
+namespace Fundering.Components.Regular
 {
     public struct NativeSpriteSize : IComponentData
     {

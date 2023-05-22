@@ -6,6 +6,6 @@ namespace Fundering.Animation.Components
 {
     public struct AnimationIndex : IComponentData
     {
-        public int value;
+        public int Value;
     }
 }

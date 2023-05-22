@@ -1,10 +1,10 @@
 ﻿using System;
-using Fundering.Base.Data;
+using Fundering.Data;
 using UnityEngine;
 
 
 
-namespace Fundering.Base.Authoring
+namespace Fundering.Authoring
 {
     [Serializable]
     public struct SpriteRenderData

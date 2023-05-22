@@ -7,6 +7,6 @@ namespace Fundering.Animation.Components
 {
     public struct AnimationSetLink : IComponentData
     {
-        public BlobAssetReference<BlobArray<SpriteAnimationBlobData>> value;
+        public BlobAssetReference<BlobArray<SpriteAnimationBlobData>> Value;
     }
 }

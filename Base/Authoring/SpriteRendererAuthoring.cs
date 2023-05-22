@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
-using Fundering.Base.Components.Properties;
+using Fundering.Components.Properties;
 using Fundering.Sorting.Components;
+using Fundering.Transform2D.Authoring;
 using NSprites;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -9,7 +10,7 @@ using SortingLayer = Fundering.Sorting.Components.SortingLayer;
 
 
 
-namespace Fundering.Base.Authoring
+namespace Fundering.Authoring
 {
     /// <summary>
     /// Adds basic render components such as <see cref="UVAtlas"/>, <see cref="UVTilingAndOffset"/>, <see cref="Scale2D"/>, <see cref="Pivot"/>.
@@ -98,15 +99,15 @@ namespace Fundering.Base.Authoring
                 return;
             }
 
-            baker.AddComponent(entity, new UVAtlas { value = uvAtlas });
-            baker.AddComponent(entity, new UVTilingAndOffset { value = uvTilingAndOffset });
-            baker.AddComponent(entity, new Pivot { value = pivot });
-            baker.AddComponent(entity, new Scale2D { value = scale });
+            baker.AddComponent(entity, new UVAtlas { Value = uvAtlas });
+            baker.AddComponent(entity, new UVTilingAndOffset { Value = uvTilingAndOffset });
+            baker.AddComponent(entity, new Pivot { Value = pivot });
+            baker.AddComponent(entity, new Scale2D { Value = scale });
             baker.AddComponent(entity, new Flip { Value = new(flipX ? -1 : 0, flipY ? -1 : 0) });
 
             if (add2DTransform)
             {
-                baker.AddComponentObject(entity, new Transform2DRequest { sourceGameObject = authoring.gameObject });
+                baker.AddComponentObject(entity, new Transform2DRequest { Source = authoring.gameObject });
                 baker.DependsOn(authoring.transform);
             }
         }
@@ -122,22 +123,22 @@ namespace Fundering.Base.Authoring
 
             baker.AddComponent<VisualSortingTag>(entity);
             baker.AddComponent<SortingValue>(entity);
-            baker.AddComponent(entity, new SortingIndex { value = sortingIndex });
-            baker.AddSharedComponent(entity, new SortingLayer { index = sortingLayer });
+            baker.AddComponent(entity, new SortingIndex { Value = sortingIndex });
+            baker.AddSharedComponent(entity, new SortingLayer { Index = sortingLayer });
             if (staticSorting)
                 baker.AddComponent<SortingStaticTag>(entity);
         }
 
-        private static readonly Dictionary<Texture, Material> _overridedMaterials = new();
+        private static readonly Dictionary<Texture, Material> overridedMaterials = new();
 
         protected Material GetOrCreateOverridedMaterial(Texture texture)
         {
-            if (!_overridedMaterials.TryGetValue(texture, out Material material))
+            if (!overridedMaterials.TryGetValue(texture, out Material material))
                 material = CreateOverridedMaterial(texture);
 #if UNITY_EDITOR //for SubScene + domain reload
             else if (material == null)
             {
-                _ = _overridedMaterials.Remove(texture);
+                _ = overridedMaterials.Remove(texture);
                 material = CreateOverridedMaterial(texture);
             }
 #endif
@@ -147,7 +148,7 @@ namespace Fundering.Base.Authoring
         {
             Material material = new Material(_spriteRenderData.Material);
             material.SetTexture("_MainTex", _sprite.texture);
-            _overridedMaterials.Add(texture, material);
+            overridedMaterials.Add(texture, material);
             return material;
         }
 

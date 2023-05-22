@@ -2,8 +2,8 @@
 using System.Linq;
 using Fundering.Animation.Components;
 using Fundering.Animation.Data;
-using Fundering.Base.Authoring;
-using Fundering.Base.Components.Properties;
+using Fundering.Authoring;
+using Fundering.Components.Properties;
 using NSprites;
 using Unity.Collections;
 using Unity.Entities;
@@ -160,12 +160,12 @@ namespace Fundering.Animation.Authoring
 
             ref SpriteAnimationBlobData initialAnim = ref blobAssetReference.Value[initialAnimationIndex];
 
-            baker.AddComponent(entity, new AnimationSetLink { value = blobAssetReference });
-            baker.AddComponent(entity, new AnimationIndex { value = initialAnimationIndex });
-            baker.AddComponent(entity, new AnimationTimer { value = initialAnim.FrameDurations[0] });
+            baker.AddComponent(entity, new AnimationSetLink { Value = blobAssetReference });
+            baker.AddComponent(entity, new AnimationIndex { Value = initialAnimationIndex });
+            baker.AddComponent(entity, new AnimationTimer { Value = initialAnim.FrameDurations[0] });
             baker.AddComponent<FrameIndex>(entity);
             
-            baker.AddComponent(entity, new MainTexSTInitial { value = initialAnim.UVAtlas });
+            baker.AddComponent(entity, new MainTexStInitial { Value = initialAnim.UVAtlas });
         }
     }
 }

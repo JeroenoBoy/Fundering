@@ -6,6 +6,6 @@ namespace Fundering.Sorting.Components
 {
     public struct SortingIndex : IComponentData
     {
-        public int value;
+        public int Value;
     }
 }

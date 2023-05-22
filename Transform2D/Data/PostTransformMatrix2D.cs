@@ -3,7 +3,7 @@ using Unity.Mathematics;
 
 
 
-namespace Fundering.FlatTransform
+namespace Fundering.Transform2D
 {
     /// <summary>
     /// An optional transformation matrix used to implement non-affine

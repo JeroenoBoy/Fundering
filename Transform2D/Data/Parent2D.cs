@@ -2,7 +2,7 @@
 
 
 
-namespace Fundering.FlatTransform
+namespace Fundering.Transform2D
 {
     public struct Parent2D : IComponentData
     {

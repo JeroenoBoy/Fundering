@@ -6,6 +6,6 @@ namespace Fundering.Animation.Components
 {
     public struct AnimationTimer : IComponentData
     {
-        public double value;
+        public double Value;
     }
 }

@@ -1,11 +1,11 @@
-using Fundering.Base.Components.Properties;
-using Fundering.Base.Components.Regular;
-using Fundering.FlatTransform.OldSystem.Components;
+using Fundering.Components.Properties;
+using Fundering.Components.Regular;
+using Fundering.Transform2D;
 using NSprites;
 
 [assembly: InstancedPropertyComponent(typeof(UVTilingAndOffset), "_uvTilingAndOffsetBuffer")]
 [assembly: InstancedPropertyComponent(typeof(UVAtlas), "_uvAtlasBuffer")]
-[assembly: InstancedPropertyComponent(typeof(WorldPosition2D), "_positionBuffer")]
+[assembly: InstancedPropertyComponent(typeof(LocalToWorld2D), "_positionBuffer")]
 [assembly: InstancedPropertyComponent(typeof(Scale2D), "_heightWidthBuffer")]
 [assembly: InstancedPropertyComponent(typeof(Pivot), "_pivotBuffer")]
 [assembly: InstancedPropertyComponent(typeof(SortingValue), "_sortingValueBuffer")]

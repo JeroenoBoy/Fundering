@@ -2,33 +2,33 @@
 
 
 
-namespace Fundering.Base.Common
+namespace Fundering.Common
 {
     public readonly struct Bounds2D
     {
-        private readonly float2 _position;
-        private readonly float2 _extents;
+        private readonly float2 position;
+        private readonly float2 extents;
 
-        public float2 Min => _position - _extents;
-        public float2 Max => _position + _extents;
-        public float2 Size => _extents * 2f;
+        public float2 Min => position - extents;
+        public float2 Max => position + extents;
+        public float2 Size => extents * 2f;
 
         public Bounds2D(in float2 position, in float2 size)
         {
-            _position = position;
-            _extents = size / 2f;
+            this.position = position;
+            extents = size / 2f;
         }
 
         public Bounds2D(in float2x2 rect)
         {
-            _position = math.lerp(rect.c0, rect.c1, .5f);
-            _extents = math.abs(rect.c1 - rect.c0) / 2f;
+            position = math.lerp(rect.c0, rect.c1, .5f);
+            extents = math.abs(rect.c1 - rect.c0) / 2f;
         }
 
         private static bool Equals(Bounds2D lhs, Bounds2D rhs)
         {
-            return math.all(lhs._position == rhs._position)
-                   && math.all(lhs._extents == rhs._extents);
+            return math.all(lhs.position == rhs.position)
+                   && math.all(lhs.extents == rhs.extents);
         }
 
         public static bool operator ==(Bounds2D lhs, Bounds2D rhs)

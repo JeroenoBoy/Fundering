@@ -1,7 +1,7 @@
 ﻿using Fundering.Animation.Components;
 using Fundering.Animation.Data;
-using Fundering.Base.Components.Properties;
-using Fundering.Base.Components.Regular;
+using Fundering.Components.Properties;
+using Fundering.Components.Regular;
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -29,14 +29,14 @@ namespace Fundering.Animation.Systems
                                     in AnimationSetLink animationSet,
                                     in AnimationIndex animationIndex)
             {
-                double timerDelta = Time - animationTimer.value;
+                double timerDelta = Time - animationTimer.Value;
 
                 if (timerDelta >= 0f)
                 {
-                    ref SpriteAnimationBlobData animData = ref animationSet.value.Value[animationIndex.value];
+                    ref SpriteAnimationBlobData animData = ref animationSet.Value.Value[animationIndex.Value];
                     int frameCount = animData.GridSize.x * animData.GridSize.y;
-                    frameIndex.value = (frameIndex.value + 1) % frameCount;
-                    float nextFrameDuration = animData.FrameDurations[frameIndex.value];
+                    frameIndex.Value = (frameIndex.Value + 1) % frameCount;
+                    float nextFrameDuration = animData.FrameDurations[frameIndex.Value];
 
                     if (timerDelta >= animData.AnimationDuration)
                     {
@@ -44,17 +44,17 @@ namespace Fundering.Animation.Systems
                         while (extraTime > nextFrameDuration)
                         {
                             extraTime -= nextFrameDuration;
-                            frameIndex.value = (frameIndex.value + 1) % frameCount;
-                            nextFrameDuration = animData.FrameDurations[frameIndex.value];
+                            frameIndex.Value = (frameIndex.Value + 1) % frameCount;
+                            nextFrameDuration = animData.FrameDurations[frameIndex.Value];
                         }
                         nextFrameDuration -= extraTime;
                     }
 
-                    animationTimer.value = Time + nextFrameDuration;
+                    animationTimer.Value = Time + nextFrameDuration;
 
                     float2 frameSize = new float2(animData.UVAtlas.xy / animData.GridSize);
-                    int2 framePosition = new int2(frameIndex.value % animData.GridSize.x, frameIndex.value / animData.GridSize.x);
-                    uvAtlas = new UVAtlas { value = new float4(frameSize, animData.UVAtlas.zw + frameSize * framePosition) };
+                    int2 framePosition = new int2(frameIndex.Value % animData.GridSize.x, frameIndex.Value / animData.GridSize.x);
+                    uvAtlas = new UVAtlas { Value = new float4(frameSize, animData.UVAtlas.zw + frameSize * framePosition) };
                 }
             }
         }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 
 
-namespace Fundering.Base.Authoring
+namespace Fundering.Authoring
 {
     /// <summary>
     /// Gets <see cref="SpriteRenderData"/> through virtual <see cref="RenderData"/> property then adds <see cref="SpriteRenderDataToRegister"/>.
@@ -23,7 +23,7 @@ namespace Fundering.Base.Authoring
                 SpriteRenderData renderData = authoring.RenderData;
                 DependsOn(renderData.PropertiesSet);
                 Entity entity = GetEntity(TransformUsageFlags.None);
-                AddComponentObject(entity, new SpriteRenderDataToRegister { data = renderData });
+                AddComponentObject(entity, new SpriteRenderDataToRegister { Data = renderData });
                 this.AddSpriteRenderComponents(entity, renderData.ID);
             }
         }

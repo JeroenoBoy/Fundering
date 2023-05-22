@@ -1,24 +1,24 @@
 ﻿using System.Collections.Generic;
-using Fundering.Base.Authoring;
+using Fundering.Authoring;
 using NSprites;
 using Unity.Collections;
 using Unity.Entities;
 
 
 
-namespace Fundering.Base.Systems
+namespace Fundering.Systems
 {
     [WorldSystemFilter(WorldSystemFilterFlags.Editor | WorldSystemFilterFlags.Default)]
     public partial class RegisterRenderersSystem : SystemBase
     {
-        private EntityQuery _renderArchetypeToRegisterQuery;
-        private EntityQuery _renderArchetypeIndexLessEntitiesQuery;
-        private HashSet<int> _registeredIDsSet = new();
+        private EntityQuery renderArchetypeToRegisterQuery;
+        private EntityQuery renderArchetypeIndexLessEntitiesQuery;
+        private HashSet<int> registeredIDsSet = new();
 
         protected override void OnCreate()
         {
             base.OnCreate();
-            _renderArchetypeToRegisterQuery = GetEntityQuery
+            renderArchetypeToRegisterQuery = GetEntityQuery
             (
                 new EntityQueryDesc
                 {
@@ -30,7 +30,7 @@ namespace Fundering.Base.Systems
                     Options = EntityQueryOptions.IncludePrefab
                 }
             );
-            _renderArchetypeIndexLessEntitiesQuery = GetEntityQuery
+            renderArchetypeIndexLessEntitiesQuery = GetEntityQuery
             (
                  new EntityQueryDesc
                  {
@@ -48,7 +48,7 @@ namespace Fundering.Base.Systems
     }
         protected override void OnUpdate()
         {
-            EntityManager.AddComponent<SpriteRenderID>(_renderArchetypeIndexLessEntitiesQuery);
+            EntityManager.AddComponent<SpriteRenderID>(renderArchetypeIndexLessEntitiesQuery);
 
             void Register(in NativeArray<Entity> entities)
             {
@@ -60,23 +60,23 @@ namespace Fundering.Base.Systems
                     Entity entity = entities[i];
                     SpriteRenderDataToRegister renderData = EntityManager.GetComponentObject<SpriteRenderDataToRegister>(entity);
 
-                    if (!_registeredIDsSet.Contains(renderData.data.ID))
+                    if (!registeredIDsSet.Contains(renderData.Data.ID))
                     {
                         renderArchetypeStorage.RegisterRender
                         (
-                            renderData.data.ID,
-                            renderData.data.Material,
-                            propertyDataSet: renderData.data.PropertiesSet.PropertyData
+                            renderData.Data.ID,
+                            renderData.Data.Material,
+                            propertyDataSet: renderData.Data.PropertiesSet.PropertyData
                         );
-                        _ = _registeredIDsSet.Add(renderData.data.ID);
+                        _ = registeredIDsSet.Add(renderData.Data.ID);
                     }
 
-                    EntityManager.SetSharedComponentManaged(entity, new SpriteRenderID { id = renderData.data.ID });
+                    EntityManager.SetSharedComponentManaged(entity, new SpriteRenderID { id = renderData.Data.ID });
                 }
             }
-            Register(_renderArchetypeToRegisterQuery.ToEntityArray(Allocator.Temp));
+            Register(renderArchetypeToRegisterQuery.ToEntityArray(Allocator.Temp));
 
-            EntityManager.RemoveComponent<SpriteRenderDataToRegister>(_renderArchetypeToRegisterQuery);
+            EntityManager.RemoveComponent<SpriteRenderDataToRegister>(renderArchetypeToRegisterQuery);
         }
     }
 }

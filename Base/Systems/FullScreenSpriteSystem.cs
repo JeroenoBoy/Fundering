@@ -1,13 +1,14 @@
-﻿using Fundering.Base.Common;
-using Fundering.Base.Components.Properties;
-using Fundering.Base.Components.Regular;
+﻿using Fundering.Common;
+using Fundering.Components.Properties;
+using Fundering.Components.Regular;
+using Fundering.Transform2D;
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 
 
 
-namespace Fundering.Base.Systems
+namespace Fundering.Systems
 {
     [UpdateAfter(typeof(UpdateCullingDataSystem))]
     public partial struct FullScreenSpriteSystem : ISystem
@@ -19,11 +20,11 @@ namespace Fundering.Base.Systems
             public float2 CameraPosition;
             public float2 ScreenSize;
             
-            private void Execute(ref Scale2D size, ref WorldPosition2D position, ref UVTilingAndOffset uvTilingAndOffset, in NativeSpriteSize nativeSpriteSize)
+            private void Execute(ref Scale2D size, ref LocalTransform2D transform, ref UVTilingAndOffset uvTilingAndOffset, in NativeSpriteSize nativeSpriteSize)
             {
-                size.value = ScreenSize;
-                position.value = CameraPosition;
-                uvTilingAndOffset.value = new float4(size.value / nativeSpriteSize.Value, CameraPosition / nativeSpriteSize.Value - size.value / nativeSpriteSize.Value / 2f);
+                size.Value = ScreenSize;
+                transform.Position = CameraPosition;
+                uvTilingAndOffset.Value = new float4(size.Value / nativeSpriteSize.Value, CameraPosition / nativeSpriteSize.Value - size.Value / nativeSpriteSize.Value / 2f);
             }
         }
         
@@ -42,7 +43,7 @@ namespace Fundering.Base.Systems
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            if(!SystemAPI.TryGetSingleton<SpriteFrustumCullingSystem.CameraData>(out SpriteFrustumCullingSystem.CameraData cameraData))
+            if(!SystemAPI.TryGetSingleton(out SpriteFrustumCullingSystem.CameraData cameraData))
                 return;
             
             RefRW<SystemData> sysData = SystemAPI.GetComponentRW<SystemData>(state.SystemHandle);

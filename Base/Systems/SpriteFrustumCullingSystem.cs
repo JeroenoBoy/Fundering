@@ -1,7 +1,7 @@
-﻿using Fundering.Base.Common;
-using Fundering.Base.Components.Properties;
-using Fundering.Base.Components.Regular;
-using Fundering.FlatTransform.OldSystem.Components;
+﻿using Fundering.Common;
+using Fundering.Components.Properties;
+using Fundering.Components.Regular;
+using Fundering.Transform2D;
 using NSprites;
 using Unity.Burst;
 using Unity.Entities;
@@ -11,7 +11,7 @@ using UnityEditor;
 
 
 
-namespace Fundering.Base.Systems
+namespace Fundering.Systems
 {
     [BurstCompile]
     public partial struct SpriteFrustumCullingSystem : ISystem
@@ -24,10 +24,10 @@ namespace Fundering.Base.Systems
             public EntityCommandBuffer.ParallelWriter EntityCommandBuffer;
             public Bounds2D CameraBounds2D;
 
-            private void Execute(Entity entity, [ChunkIndexInQuery]int chunkIndex, in WorldPosition2D worldPosition, in Scale2D size, in Pivot pivot)
+            private void Execute(Entity entity, [ChunkIndexInQuery]int chunkIndex, in LocalToWorld2D transform, in Scale2D size, in Pivot pivot)
             {
-                float2 viewCenterPosition = worldPosition.value - size.value * pivot.value + size.value * .5f;
-                if(!CameraBounds2D.Intersects(new Bounds2D(viewCenterPosition, size.value)))
+                float2 viewCenterPosition = transform.Position - size.Value * pivot.Value + size.Value * .5f;
+                if(!CameraBounds2D.Intersects(new Bounds2D(viewCenterPosition, size.Value)))
                     EntityCommandBuffer.AddComponent<CullSpriteTag>(chunkIndex, entity);
             }
         }
@@ -39,10 +39,10 @@ namespace Fundering.Base.Systems
             public EntityCommandBuffer.ParallelWriter EntityCommandBuffer;
             public Bounds2D CameraBounds2D;
 
-            private void Execute(Entity entity, [ChunkIndexInQuery] int chunkIndex, in WorldPosition2D worldPosition, in Scale2D size, in Pivot pivot)
+            private void Execute(Entity entity, [ChunkIndexInQuery] int chunkIndex, in LocalToWorld2D worldPosition, in Scale2D size, in Pivot pivot)
             {
-                float2 viewCenterPosition = worldPosition.value - size.value * pivot.value + size.value * .5f;
-                if (CameraBounds2D.Intersects(new Bounds2D(viewCenterPosition, size.value)))
+                float2 viewCenterPosition = worldPosition.Position - size.Value * pivot.Value + size.Value * .5f;
+                if (CameraBounds2D.Intersects(new Bounds2D(viewCenterPosition, size.Value)))
                     EntityCommandBuffer.RemoveComponent<CullSpriteTag>(chunkIndex, entity);
             }
         }

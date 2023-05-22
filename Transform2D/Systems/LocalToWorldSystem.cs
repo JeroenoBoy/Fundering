@@ -10,7 +10,7 @@ using static Unity.Mathematics.math;
 
 
 
-namespace Fundering.FlatTransform.Systems
+namespace Fundering.Transform2D.Systems
 {
     /// <summary>
     /// This system computes a <see cref="LocalToWorld2D"/> matrix for each entity

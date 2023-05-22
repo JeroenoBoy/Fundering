@@ -1,10 +1,10 @@
-﻿using Fundering.Base.Components.Regular;
+﻿using Fundering.Components.Regular;
 using Unity.Entities;
 using UnityEngine;
 
 
 
-namespace Fundering.Base.Authoring
+namespace Fundering.Authoring
 {
     public class FullScreenSpriteAuthoring : MonoBehaviour
     {

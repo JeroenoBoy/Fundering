@@ -2,10 +2,10 @@
 
 
 
-namespace Fundering.Base.Components.Properties
+namespace Fundering.Components.Properties
 {
     public struct SortingValue : IComponentData
     {
-        public float value;
+        public float Value;
     }
 }

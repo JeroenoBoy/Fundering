@@ -1,11 +1,14 @@
 ﻿using System.Runtime.CompilerServices;
+using Unity.Burst;
 using Unity.Mathematics;
+
 // ReSharper disable InconsistentNaming
 
 
 
-namespace Fundering.FlatTransform
+namespace Fundering
 {
+    [BurstCompile]
     public static class math2D
     {
         public static float2 rotate(float angle, float2 position)
@@ -39,6 +42,9 @@ namespace Fundering.FlatTransform
         }
 
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float3 float3(float2 vector) => math.float3(vector.x, vector.y, 0f);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float2 float2(float3 vector) => vector.xy;
     }
 }

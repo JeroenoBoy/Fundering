@@ -13,7 +13,7 @@ namespace Fundering.Animation.Data
 
         #region Editor
 #if UNITY_EDITOR
-        private const float DefaultFrameDuration = .1f;
+        private const float DEFAULT_FRAME_DURATION = .1f;
         private void OnValidate()
         {
             int frameCount = FrameCount.x * FrameCount.y;
@@ -24,7 +24,7 @@ namespace Fundering.Animation.Data
                 for (int i = 0; i < minLength; i++)
                     correctedFrameDurations[i] = FrameDurations[i];
                 for (int i = minLength; i < correctedFrameDurations.Length; i++)
-                    correctedFrameDurations[i] = DefaultFrameDuration;
+                    correctedFrameDurations[i] = DEFAULT_FRAME_DURATION;
                 FrameDurations = correctedFrameDurations;
             }
         }

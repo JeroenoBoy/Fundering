@@ -3,7 +3,7 @@ using Unity.Mathematics;
 
 
 
-namespace Fundering.Base.Components.Properties
+namespace Fundering.Components.Properties
 {
     public struct Flip : IComponentData
     {

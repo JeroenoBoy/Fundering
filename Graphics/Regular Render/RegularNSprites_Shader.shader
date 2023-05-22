@@ -55,7 +55,7 @@
             StructuredBuffer<float4> _uvTilingAndOffsetBuffer;
             StructuredBuffer<float4> _uvAtlasBuffer;
             StructuredBuffer<float> _sortingValueBuffer;
-            StructuredBuffer<float2> _positionBuffer;
+            StructuredBuffer<float4x4> _positionBuffer;
             StructuredBuffer<float2> _pivotBuffer;
             StructuredBuffer<float2> _heightWidthBuffer;
             StructuredBuffer<int2> _flipBuffer;
@@ -66,14 +66,8 @@
 #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED) || defined(UNITY_STEREO_INSTANCING_ENABLED)
                 int propertyIndex = _propertyPointers[unity_InstanceID];
                 float2 scale = _heightWidthBuffer[propertyIndex];
-                float2 renderPos = _positionBuffer[propertyIndex] - scale * _pivotBuffer[propertyIndex];
-                unity_ObjectToWorld = half4x4
-                (
-                    scale.x, 0, 0, renderPos.x,
-                    0, scale.y, 0, renderPos.y,
-                    0, 0, 1, 0,
-                    0, 0, 0, 1
-                );
+                float4x4 renderPos = _positionBuffer[propertyIndex];
+                unity_ObjectToWorld = renderPos;
 #endif
             }
 

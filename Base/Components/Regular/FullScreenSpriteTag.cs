@@ -2,7 +2,7 @@
 
 
 
-namespace Fundering.Base.Components.Regular
+namespace Fundering.Components.Regular
 {
     public struct FullScreenSpriteTag : IComponentData
     {

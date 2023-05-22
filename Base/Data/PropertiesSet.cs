@@ -4,7 +4,7 @@ using UnityEngine;
 
 
 
-namespace Fundering.Base.Data
+namespace Fundering.Data
 {
     [CreateAssetMenu(fileName = "PropertiesSet", menuName = "NSprites/Shader Properties Set", order = 1)]
     public class PropertiesSet : ScriptableObject

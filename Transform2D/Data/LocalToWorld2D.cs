@@ -1,12 +1,11 @@
-﻿using NSprites;
-using Unity.Entities;
+﻿using Unity.Entities;
 using Unity.Mathematics;
 using quaternion = Unity.Mathematics.quaternion;
 using static Unity.Mathematics.math;
 
 
 
-namespace Fundering.FlatTransform
+namespace Fundering.Transform2D
 {
     /// <summary>
     /// Only used for rendering, do not touch change

@@ -3,10 +3,10 @@ using Unity.Mathematics;
 
 
 
-namespace Fundering.Base.Components.Properties
+namespace Fundering.Components.Properties
 {
-    public struct MainTexSTInitial : IComponentData
+    public struct MainTexStInitial : IComponentData
     {
-        public float4 value;
+        public float4 Value;
     }
 }

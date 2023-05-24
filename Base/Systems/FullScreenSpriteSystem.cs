@@ -20,11 +20,11 @@ namespace Fundering.Systems
             public float2 CameraPosition;
             public float2 ScreenSize;
             
-            private void Execute(ref Scale2D size, ref LocalTransform2D transform, ref UVTilingAndOffset uvTilingAndOffset, in NativeSpriteSize nativeSpriteSize)
+            private void Execute(ref LocalTransform2D transform, ref UVTilingAndOffset uvTilingAndOffset, in NativeSpriteSize nativeSpriteSize)
             {
-                size.Value = ScreenSize;
+                transform.Scale = ScreenSize;
                 transform.Position = CameraPosition;
-                uvTilingAndOffset.Value = new float4(size.Value / nativeSpriteSize.Value, CameraPosition / nativeSpriteSize.Value - size.Value / nativeSpriteSize.Value / 2f);
+                uvTilingAndOffset.Value = new float4(transform.Scale / nativeSpriteSize.Value, CameraPosition / nativeSpriteSize.Value - transform.Scale / nativeSpriteSize.Value / 2f);
             }
         }
         
@@ -48,17 +48,15 @@ namespace Fundering.Systems
             
             RefRW<SystemData> sysData = SystemAPI.GetComponentRW<SystemData>(state.SystemHandle);
 
-            if(cameraData.CullingBounds2D != sysData.ValueRO.LastCameraBounds)
-            {
-                sysData.ValueRW.LastCameraBounds = cameraData.CullingBounds2D;
+            if (cameraData.CullingBounds2D == sysData.ValueRO.LastCameraBounds) return;
+            sysData.ValueRW.LastCameraBounds = cameraData.CullingBounds2D;
                 
-                RecalculateSpritesJob recalculateSpriteJob = new RecalculateSpritesJob
-                {
-                    CameraPosition = cameraData.Position,
-                    ScreenSize = cameraData.CullingBounds2D.Size
-                };
-                state.Dependency = recalculateSpriteJob.ScheduleByRef(state.Dependency);
-            }
+            RecalculateSpritesJob recalculateSpriteJob = new RecalculateSpritesJob
+            {
+                CameraPosition = cameraData.Position,
+                ScreenSize     = cameraData.CullingBounds2D.Size
+            };
+            state.Dependency = recalculateSpriteJob.ScheduleByRef(state.Dependency);
         }
     }
 }

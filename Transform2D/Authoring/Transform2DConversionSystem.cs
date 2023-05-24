@@ -44,13 +44,12 @@ namespace Fundering.Transform2D.Authoring
                     
                     void Convert(Transform transform, in Entity entity, in Entity parentEntity)
                     {
-                        Vector3 localScale = transform.localScale;
                         ecb.AddComponent(entity, new LocalToWorld2D { Value = transform.localToWorldMatrix});
                         ecb.AddComponent(entity, new LocalTransform2D
                         {
                             Position = float2(transform.localPosition),
                             Rotation = transform.localRotation,
-                            Scale = max(localScale.x, max(localScale.y, localScale.z))
+                            Scale = float2(transform.localScale)
                         });
 
                         if (parentEntity != Entity.Null)

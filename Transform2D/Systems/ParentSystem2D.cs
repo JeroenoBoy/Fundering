@@ -91,36 +91,34 @@ namespace Fundering.Transform2D.Systems
                     NativeArray<Parent2D>         chunkParents         = chunk.GetNativeArray(ref ParentTypeHandle);
                     NativeArray<Entity>           chunkEntities        = chunk.GetNativeArray(EntityTypeHandle);
 
-                    for (int j = 0, chunkEntityCount = chunk.Count; j < chunkEntityCount; j++)
-                    {
-                        if (chunkParents[j].Value != chunkPreviousParents[j].Value)
+                    for (int j = 0, chunkEntityCount = chunk.Count; j < chunkEntityCount; j++) {
+                        if (chunkParents[j].Value == chunkPreviousParents[j].Value) continue;
+                        
+                        Entity childEntity          = chunkEntities[j];
+                        Entity parentEntity         = chunkParents[j].Value;
+                        Entity previousParentEntity = chunkPreviousParents[j].Value;
+
+                        if (!EntityStorageInfoLookup.Exists(parentEntity))
                         {
-                            Entity childEntity = chunkEntities[j];
-                            Entity parentEntity = chunkParents[j].Value;
-                            Entity previousParentEntity = chunkPreviousParents[j].Value;
-
-                            if (!EntityStorageInfoLookup.Exists(parentEntity))
-                            {
-                                // If we get here, the Parent component is pointing to an invalid entity
-                                // This can happen, for example, if a parent has been deleted before ParentSystem has had a chance to add a PreviousParent component
-                                ChildParentToRemove.Add(childEntity);
-                                continue;
-                            }
-
-                            ParentChildrenToAdd.Add(parentEntity, childEntity);
-                            UniqueParents.TryAdd(parentEntity, 0);
-
-                            if (ChildLookup.HasBuffer(previousParentEntity))
-                            {
-                                ParentChildrenToRemove.Add(previousParentEntity, childEntity);
-                                UniqueParents.TryAdd(previousParentEntity, 0);
-                            }
-
-                            chunkPreviousParents[j] = new PreviousParent2D
-                            {
-                                Value = parentEntity
-                            };
+                            // If we get here, the Parent component is pointing to an invalid entity
+                            // This can happen, for example, if a parent has been deleted before ParentSystem has had a chance to add a PreviousParent component
+                            ChildParentToRemove.Add(childEntity);
+                            continue;
                         }
+
+                        ParentChildrenToAdd.Add(parentEntity, childEntity);
+                        UniqueParents.TryAdd(parentEntity, 0);
+
+                        if (ChildLookup.HasBuffer(previousParentEntity))
+                        {
+                            ParentChildrenToRemove.Add(previousParentEntity, childEntity);
+                            UniqueParents.TryAdd(previousParentEntity, 0);
+                        }
+
+                        chunkPreviousParents[j] = new PreviousParent2D
+                        {
+                            Value = parentEntity
+                        };
                     }
                 }
             }

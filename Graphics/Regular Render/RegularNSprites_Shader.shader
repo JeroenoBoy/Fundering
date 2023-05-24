@@ -57,17 +57,28 @@
             StructuredBuffer<float> _sortingValueBuffer;
             StructuredBuffer<float4x4> _positionBuffer;
             StructuredBuffer<float2> _pivotBuffer;
-            StructuredBuffer<float2> _heightWidthBuffer;
+            StructuredBuffer<float2> _scaleBuffer;
             StructuredBuffer<int2> _flipBuffer;
 #endif
+
+            float4x4 offset_matrix(const float2 input, const float2 scale)
+            {
+                return float4x4(
+                    scale.x,0,0,scale.x * -input.x,
+                    0,scale.y,0,scale.y * -input.y,
+                    0,0,1,0,
+                    0,0,0,1
+                );
+            }
 
             void setup()
             {
 #if defined(UNITY_INSTANCING_ENABLED) || defined(UNITY_PROCEDURAL_INSTANCING_ENABLED) || defined(UNITY_STEREO_INSTANCING_ENABLED)
                 int propertyIndex = _propertyPointers[unity_InstanceID];
-                float2 scale = _heightWidthBuffer[propertyIndex];
-                float4x4 renderPos = _positionBuffer[propertyIndex];
-                unity_ObjectToWorld = renderPos;
+                float4x4 transform = _positionBuffer[propertyIndex];
+                float2 pivot = _pivotBuffer[propertyIndex];
+                float2 scale = _scaleBuffer[propertyIndex];
+                unity_ObjectToWorld = mul(transform, offset_matrix(pivot, scale));
 #endif
             }
 

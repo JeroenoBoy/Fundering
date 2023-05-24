@@ -8,6 +8,7 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEditor;
+using UnityEngine.UIElements;
 
 
 
@@ -24,10 +25,12 @@ namespace Fundering.Systems
             public EntityCommandBuffer.ParallelWriter EntityCommandBuffer;
             public Bounds2D CameraBounds2D;
 
-            private void Execute(Entity entity, [ChunkIndexInQuery]int chunkIndex, in LocalToWorld2D transform, in Scale2D size, in Pivot pivot)
+            private void Execute(Entity entity, [ChunkIndexInQuery]int chunkIndex, in LocalToWorld2D transform, in Pivot pivot)
             {
-                float2 viewCenterPosition = transform.Position - size.Value * pivot.Value + size.Value * .5f;
-                if(!CameraBounds2D.Intersects(new Bounds2D(viewCenterPosition, size.Value)))
+                float2 scale              = transform.Scale;
+                float2 viewCenterPosition = transform.Position - scale * pivot.Value + scale * .5f;
+                
+                if(!CameraBounds2D.Intersects(new Bounds2D(viewCenterPosition, scale)))
                     EntityCommandBuffer.AddComponent<CullSpriteTag>(chunkIndex, entity);
             }
         }
@@ -39,10 +42,12 @@ namespace Fundering.Systems
             public EntityCommandBuffer.ParallelWriter EntityCommandBuffer;
             public Bounds2D CameraBounds2D;
 
-            private void Execute(Entity entity, [ChunkIndexInQuery] int chunkIndex, in LocalToWorld2D worldPosition, in Scale2D size, in Pivot pivot)
+            private void Execute(Entity entity, [ChunkIndexInQuery] int chunkIndex, in LocalToWorld2D worldPosition, in Pivot pivot)
             {
-                float2 viewCenterPosition = worldPosition.Position - size.Value * pivot.Value + size.Value * .5f;
-                if (CameraBounds2D.Intersects(new Bounds2D(viewCenterPosition, size.Value)))
+                float2 scale              = worldPosition.Scale;
+                float2 viewCenterPosition = worldPosition.Position - scale * pivot.Value + scale * .5f;
+                
+                if (CameraBounds2D.Intersects(new Bounds2D(viewCenterPosition, scale)))
                     EntityCommandBuffer.RemoveComponent<CullSpriteTag>(chunkIndex, entity);
             }
         }

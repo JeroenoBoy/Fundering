@@ -17,6 +17,7 @@ namespace Fundering.Transform2D
         public float2     Right    => float2(Value.c0.x, Value.c0.y);
         public float2     Up       => float2(Value.c1.x, Value.c1.y);
         public float2     Position => float2(Value.c3.x, Value.c3.y);
+        public float2     Scale    => float2(length(Value.c0), length(Value.c1));
         public quaternion Rotation => quaternion(Value);
     }
 }

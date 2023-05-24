@@ -27,7 +27,7 @@ namespace Fundering.Transform2D
         /// The uniform scale of this transform.
         /// </summary>
         [CreateProperty]
-        public float Scale;
+        public float2 Scale;
 
         /// <summary>
         /// The rotation of this transform.
@@ -118,7 +118,7 @@ namespace Fundering.Transform2D
         /// <param name="position">The position.</param>
         /// <param name="rotation">The rotation.</param>
         /// <returns>The Transform.</returns>
-        public static LocalTransform2D FromPositionRotation(float2 position, quaternion rotation) => new() {Position = position, Scale = 1.0f, Rotation = rotation};
+        public static LocalTransform2D FromPositionRotation(float2 position, quaternion rotation) => new() {Position = position, Scale = 1f, Rotation = rotation};
 
         /// <summary>
         /// Returns a Transform initialized with the given position, rotation and scale.
@@ -127,14 +127,14 @@ namespace Fundering.Transform2D
         /// <param name="rotation">The rotation.</param>
         /// <param name="scale">The scale.</param>
         /// <returns>The Transform.</returns>
-        public static LocalTransform2D FromPositionRotationScale(float2 position, quaternion rotation, float scale) => new() {Position = position, Scale = scale, Rotation = rotation};
+        public static LocalTransform2D FromPositionRotationScale(float2 position, quaternion rotation, float2 scale) => new() {Position = position, Scale = scale, Rotation = rotation};
 
         /// <summary>
         /// Returns a Transform initialized with the given position. Rotation will be identity, and scale will be 1.
         /// </summary>
         /// <param name="position">The position.</param>
         /// <returns>The Transform.</returns>
-        public static LocalTransform2D FromPosition(float2 position) => new() {Position = position, Scale = 1.0f, Rotation = quaternion.identity};
+        public static LocalTransform2D FromPosition(float2 position) => new() {Position = position, Scale = 1f, Rotation = quaternion.identity};
 
         /// <summary>
         /// Returns a Transform initialized with the given position. Rotation will be identity, and scale will be 1.
@@ -142,21 +142,21 @@ namespace Fundering.Transform2D
         /// <param name="x">The x coordinate of the position.</param>
         /// <param name="y">The y coordinate of the position.</param>
         /// <returns>The Transform.</returns>
-        public static LocalTransform2D FromPosition(float x, float y) => new() {Position = new float2(x,y), Scale = 1.0f, Rotation = quaternion.identity};
+        public static LocalTransform2D FromPosition(float x, float y) => new() {Position = new float2(x,y), Scale = 1f, Rotation = quaternion.identity};
 
         /// <summary>
         /// Returns a Transform initialized with the given rotation. Position will be 0,0,0, and scale will be 1.
         /// </summary>
         /// <param name="rotation">The rotation.</param>
         /// <returns>The Transform.</returns>
-        public static LocalTransform2D FromRotation(quaternion rotation) => new() {Position = float2.zero, Scale = 1.0f, Rotation = rotation};
+        public static LocalTransform2D FromRotation(quaternion rotation) => new() {Position = float2.zero, Scale = 1f, Rotation = rotation};
 
         /// <summary>
         /// Returns a Transform initialized with the given scale. Position will be 0,0,0, and rotation will be identity.
         /// </summary>
         /// <param name="scale">The scale.</param>
         /// <returns>The Transform.</returns>
-        public static LocalTransform2D FromScale(float scale) => new() {Position = float2.zero, Scale = scale, Rotation = quaternion.identity};
+        public static LocalTransform2D FromScale(float2 scale) => new() {Position = float2.zero, Scale = scale, Rotation = quaternion.identity};
 
         /// <summary>
         /// Convert transformation data to a human-readable string
@@ -164,7 +164,7 @@ namespace Fundering.Transform2D
         /// <returns>The transform value as a human-readable string</returns>
         public override string ToString()
         {
-            return $"Position={Position.ToString()} Rotation={Rotation.ToString()} Scale={Scale.ToString(CultureInfo.InvariantCulture)}";
+            return $"Position={Position.ToString()} Rotation={Rotation.ToString()} Scale={Scale.ToString()}";
         }
 
         /// <summary>
@@ -229,7 +229,7 @@ namespace Fundering.Transform2D
         /// </summary>
         /// <param name="scale">The scale to be transformed.</param>
         /// <returns>The scale after transformation.</returns>
-        public float TransformScale(float scale) => scale * Scale;
+        public float2 TransformScale(float2 scale) => scale * Scale;
 
         /// <summary>
         /// Transforms a scale by the inverse of this transform.
@@ -239,7 +239,7 @@ namespace Fundering.Transform2D
         /// </remarks>
         /// <param name="scale">The scale to be transformed.</param>
         /// <returns>The scale after transformation.</returns>
-        public float InverseTransformScale(float scale) => scale / Scale;
+        public float2 InverseTransformScale(float2 scale) => scale / Scale;
 
         /// <summary>
         /// Transforms a Transform by this transform.
@@ -275,7 +275,7 @@ namespace Fundering.Transform2D
         public LocalTransform2D Inverse()
         {
             quaternion inverseRotation = conjugate(Rotation);
-            float inverseScale = 1.0f / Scale;
+            float2 inverseScale = 1.0f / Scale;
             return new()
             {
                 Position = -rotate(0f, Position) * inverseScale,
@@ -288,7 +288,7 @@ namespace Fundering.Transform2D
         /// Gets the float4x4 equivalent of this transform.
         /// </summary>
         /// <returns>The float4x4 matrix.</returns>
-        public float4x4 ToMatrix() => float4x4.TRS(float3(Position), Rotation, Scale);
+        public float4x4 ToMatrix() => float4x4.TRS(float3(Position), Rotation, float3(Scale));
 
         /// <summary>
         /// Gets the float4x4 equivalent of the inverse of this transform.

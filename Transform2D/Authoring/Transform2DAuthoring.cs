@@ -12,6 +12,7 @@ namespace Fundering.Transform2D.Authoring
         {
             public override void Bake(Transform2DAuthoring authoring)
             {
+                DependsOn(authoring.transform);
                 AddComponentObject(GetEntityWithoutDependency(), new Transform2DRequest { Source = authoring.gameObject });
             }
         }

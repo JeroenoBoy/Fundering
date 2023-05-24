@@ -37,7 +37,7 @@ namespace Fundering.Authoring
                     authoring,
                     NSpritesUtils.GetTextureST(authoring._sprite),
                     authoring._tilingAndOffset,
-                    authoring._pivot,
+                    authoring._sprite.pivot / authoring._sprite.rect.size,
                     authoring.VisualSize,
                     flipX: authoring._flip.x,
                     flipY: authoring._flip.y
@@ -58,7 +58,6 @@ namespace Fundering.Authoring
         private Sprite lastAssignedSprite;
         [SerializeField] protected SpriteRenderData _spriteRenderData;
         [SerializeField] protected bool _overrideSpriteTexture = true;
-        [SerializeField] protected float2 _pivot = new(.5f);
         [SerializeField] protected float2 _size;
         [Tooltip("Prevents changing Size when Sprite changed")][SerializeField] private bool _lockSize;
         [SerializeField] protected float4 _tilingAndOffset = new(1f, 1f, 0f, 0f);

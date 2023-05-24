@@ -41,7 +41,7 @@ namespace Fundering.Animation.Authoring
                     authoring,
                     new float4(new float2(initialAnimUVAtlas.xy / initialAnimData.FrameCount), initialAnimUVAtlas.zw),
                     authoring._tilingAndOffset,
-                    authoring._pivot,
+                    authoring._sprite.pivot,
                     authoring.VisualSize,
                     flipX: authoring._flip.x,
                     flipY: authoring._flip.y

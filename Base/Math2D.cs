@@ -46,5 +46,9 @@ namespace Fundering
         public static float3 float3(float2 vector) => math.float3(vector.x, vector.y, 0f);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float2 float2(float3 vector) => vector.xy;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float2 mul(float4x4 a, float2 b) => math.mul(a, math.float4(b.x, b.y, 0, 0)).xy;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float2 transform(float4x4 a, float2 b) => math.transform(a, float3(b)).xy;
     }
 }
